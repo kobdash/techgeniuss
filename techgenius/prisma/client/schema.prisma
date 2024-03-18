@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Generator configuration remains unchanged
+generator client {
+  provider = "prisma-client-js"
+  output   = "client"
+}
+
+// Datasource configuration with PostgreSQL provider and the correct URL
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Add or modify models below
+
+model organization {
+  id      Int      @id @default(autoincrement())
+  name    String
+  users   users[]  // Reverse relation to users
+}
+
+model roles {
+  id      Int      @id @default(autoincrement())
+  name    String
+  users   users[]  // Reverse relation to users
+}
+
+model organization_group_users {
+  id      Int      @id @default(autoincrement())
+  // Define other fields related to organization_group_users
+  users   users[]  // Relation to users
+}
+
+model survey {
+  id      Int      @id @default(autoincrement())
+  // Define other fields related to survey
+  users   users[]  // Relation to users
+}
+
+model user_surveys {
+  id      Int      @id @default(autoincrement())
+  // Define other fields related to user_surveys
+  users   users[]  // Relation to users
+}
+
+model users {
+  id                       Int                        @id @default(autoincrement())
+  email                    String?                    @db.VarChar(255)
+  enabled                  Boolean
+  first_name               String?                    @db.VarChar(255)
+  last_name                String?                    @db.VarChar(255)
+  otp_token                String?                    @db.VarChar(255)
+  password                 String?                    @db.VarChar(255)
+  password_reset_token     String?                    @db.VarChar(255)
+  phone_number             String?                    @db.VarChar(255)
+  username                 String                     @unique @db.VarChar(255)
+  organization_id          Int
+  role_id                  Int?                       // Modified type to match the referenced field type
+  organization             organization               @relation(fields: [organization_id], references: [id], onUpdate: NoAction)
+  roles                    roles?                     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  organization_group_users organization_group_users[]  // Relation to organization_group_users
+  survey                   survey[]                   // Relation to survey
+  user_surveys             user_surveys[]             // Relation to user_surveys
+}
+
